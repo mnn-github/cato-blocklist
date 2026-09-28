@@ -2,11 +2,9 @@ name: Update HaGeZi Cato Blocklist
 
 on:
   schedule:
-    # Daily at 3:17 AM Eastern
     - cron: "17 3 * * *"
       timezone: "America/New_York"
 
-  # Allows you to run the workflow manually
   workflow_dispatch:
 
 permissions:
@@ -18,10 +16,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 
