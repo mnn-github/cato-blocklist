@@ -2,7 +2,7 @@ name: Update HaGeZi Cato Blocklist
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "00 2 * * *"
       timezone: "America/New_York"
 
   workflow_dispatch:
