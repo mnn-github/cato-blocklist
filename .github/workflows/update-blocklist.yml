@@ -1,0 +1,43 @@
+name: Update HaGeZi Cato Blocklist
+
+on:
+  schedule:
+    # Daily at 3:17 AM Eastern
+    - cron: "17 3 * * *"
+      timezone: "America/New_York"
+
+  # Allows you to run the workflow manually
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-blocklist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Download and normalize HaGeZi
+        run: python scripts/normalize.py
+
+      - name: Commit updated blocklist
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add output/hagezi-pro.txt
+
+          if git diff --cached --quiet; then
+            echo "No changes to blocklist."
+          else
+            git commit -m "Update HaGeZi PRO blocklist"
+            git push
+          fi
