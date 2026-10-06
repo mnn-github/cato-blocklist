@@ -1,5 +1,3 @@
-Replace your existing `README.md` with the following. This version documents both independent blocklists, the single normalization script, and the single scheduled GitHub Action.
-
 # Cato Blocklist Automation
 
 Automatically downloads, validates, normalizes, and publishes multiple DNS blocklists in a format suitable for **Cato Networks FQDN Containers**.
