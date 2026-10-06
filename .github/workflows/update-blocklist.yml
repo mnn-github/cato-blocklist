@@ -1,41 +1,109 @@
-name: Update HaGeZi Cato Blocklist
+# ---------------------------------------------------------------------------
+# Cato Blocklist Updater
+#
+# Updates:
+#   - HaGeZi Multi PRO
+#   - StevenBlack Unified (adware + malware)
+#
+# Runs once per day at 3:17 AM Eastern Time.
+#
+# Generated files:
+#
+#   output/hagezi-pro.txt
+#   output/stevenblack-unified.txt
+# ---------------------------------------------------------------------------
+
+name: Update Cato Blocklists
+
 
 on:
+
+  # Run once every day at 3:00 AM Eastern.
   schedule:
-    - cron: "00 2 * * *"
+    - cron: "00 3 * * *"
       timezone: "America/New_York"
 
+  # Allow manual execution from the GitHub Actions page.
   workflow_dispatch:
 
+
+# Required because the workflow commits the generated blocklists
+# back to this repository.
 permissions:
   contents: write
 
+
 jobs:
-  update-blocklist:
+
+  update-blocklists:
+
     runs-on: ubuntu-latest
 
     steps:
+
+      # ---------------------------------------------------------------------
+      # Download the repository to the temporary GitHub runner.
+      # ---------------------------------------------------------------------
+
       - name: Checkout repository
         uses: actions/checkout@v7
 
+
+      # ---------------------------------------------------------------------
+      # Configure Python.
+      #
+      # normalize.py uses only Python's standard library.
+      # ---------------------------------------------------------------------
+
       - name: Set up Python
         uses: actions/setup-python@v7
+
         with:
           python-version: "3.x"
 
-      - name: Download and normalize HaGeZi
+
+      # ---------------------------------------------------------------------
+      # Process BOTH blocklists.
+      #
+      # normalize.py creates:
+      #
+      # output/hagezi-pro.txt
+      # output/stevenblack-unified.txt
+      #
+      # If either feed fails validation, Python exits with code 1
+      # and the workflow stops before the commit step.
+      # ---------------------------------------------------------------------
+
+      - name: Download and normalize blocklists
         run: python scripts/normalize.py
 
-      - name: Commit updated blocklist
+
+      # ---------------------------------------------------------------------
+      # Commit the generated files only when something changed.
+      # ---------------------------------------------------------------------
+
+      - name: Commit updated blocklists
+
         run: |
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # Stage both generated blocklists.
           git add output/hagezi-pro.txt
+          git add output/stevenblack-unified.txt
 
+          # If neither file changed, finish without creating a commit.
           if git diff --cached --quiet; then
-            echo "No changes to blocklist."
+
+            echo "No blocklist changes."
+
           else
-            git commit -m "Update HaGeZi PRO blocklist"
+
+            echo "Blocklists changed. Committing updates."
+
+            git commit -m "Update Cato blocklists"
+
             git push
+
           fi
