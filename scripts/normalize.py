@@ -403,7 +403,9 @@ def parse_feed(feed: dict, text: str) -> set[str]:
 
 def read_existing_count(output_file: Path) -> int:
     """
-    Return the number of non-empty entries in the previous output file.
+    Return the number of actual FQDN entries in the previous output file.
+
+    Blank lines and comment lines beginning with '#' are ignored.
 
     Returns 0 when the file does not yet exist.
     """
@@ -421,6 +423,7 @@ def read_existing_count(output_file: Path) -> int:
                 1
                 for line in file
                 if line.strip()
+                and not line.lstrip().startswith("#")
             )
 
     except OSError as exc:
@@ -428,7 +431,6 @@ def read_existing_count(output_file: Path) -> int:
             f"Unable to read existing output file "
             f"{output_file}: {exc}"
         ) from exc
-
 
 # ---------------------------------------------------------------------------
 # Feed safety validation
